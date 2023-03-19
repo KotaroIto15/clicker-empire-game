@@ -114,7 +114,6 @@
     flex-direction: column;
     width: 85%;
     height: 65%;
-    background-color: red;
     overflow: auto;
     box-shadow: 0 1rem 2rem hsl(0, 0%, 32%);
 }
@@ -142,6 +141,7 @@
 
 .item:hover {
     cursor: pointer;
+    border-width: 4px;
 }
 
 .item-info {

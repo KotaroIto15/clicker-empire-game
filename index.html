@@ -14,20 +14,20 @@
 <body>
 
     <div class = "main-bg min-vh-100">
-        <div id = "login-bg" class = "d-none d-flex min-vh-100 col-12 justify-content-center align-items-center">
+        <div id = "login-bg" class = "d-flex min-vh-100 col-12 justify-content-center align-items-center">
             <div class = "login col-md-5 col-lg-4 pt-3 pb-4">
                 <h1 class = "title mb-3">Clicker Empire Game</h1>
                 <div class = "d-flex col-10 justify-content-center mb-3">
                     <input id = "user-name" class = "mx-4" type="text" placeholder="Your Name">
                 </div>
                 <div class = "col-10 d-flex justify-content-around">
-                    <button class = "col-4 login-btn mx-3">New</button>
+                    <button id = "start-new" class = "col-4 login-btn mx-3">New</button>
                     <button class = "col-4 login-btn mx-3">Login</button>
                 </div>
             </div>
         </div>
 
-        <div id = "game-bg" class = "d-flex col-12 min-vh-100">
+        <div id = "game-bg" class = "d-none d-flex col-12 min-vh-100">
 
             <div id = "burger-bg" class = "col-4">
 
@@ -37,7 +37,7 @@
                 </div>
 
                 <div id = "burger-click" class = "col-12 d-flex align-items-center justify-content-center">
-                    <img class = "burger-img" src="burger.png" alt="">
+                    <img class = "burger-img" src="images/burger.png" alt="">
                 </div>
             </div>
 
@@ -65,11 +65,11 @@
                     </div>
                 </div>
 
-                <div class = "item-list mt-3">
+                <div id = "item-list" class = "item-list mt-3">
                     <div id = "flip-machine" class="item">
                         <div class="item-info">
                             <div class="img-wrap">
-                                <img src="burger-flipper.jpg" alt="">
+                                <img src="images/burger-flipper.jpg" alt="">
                             </div>
 
                             <div class="name-price">
@@ -98,7 +98,8 @@
         </div>
     </div>
 
-    <script src="ceg.js" async></script>
+    <script src="js/Item.js" async></script>
+    <script src="js/ceg.js" async></script>
     
 </body>
 </html>

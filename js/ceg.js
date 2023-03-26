@@ -6,6 +6,8 @@ const config =
     itemList: document.getElementById("item-list"),
 };
 
+let user;
+
 // CLASS DEFINITION //
 
 
@@ -35,16 +37,37 @@ function displayItem(item) {
 
         <div class="item-current-state">
             <h1 class="text-center" id = "item-number">2</h1>
-            <p class="fs-4">+$${item.prfit} / sec</p>
+            <p class="fs-4">+$${item.profit} / sec</p>
         </div>
     `;
 
     config.itemList.append(container);
 }
 
+function startGame() {
+    let userName = document.getElementById("user-name");
+    user = new User(userName.value);
+    
+    let profile = document.getElementById("right-div");
+    profile.querySelector("#name").innerHTML = user.name;
+    profile.querySelector("#age").innerHTML = user.age;
+    profile.querySelector("#days").innerHTML = user.days;
+    profile.querySelector("#money").innerHTML = user.balance;
+}
+
 let start = document.getElementById("start-new");
 start.addEventListener("click", function() {
     config.itemList.innerHTML = "";
     items.forEach(displayItem);
+    startGame();
     switchPage(config.login, config.game);
+});
+
+let burgerClick = document.getElementById("burger-click");
+burgerClick.addEventListener("mousedown", function() {
+    burgerClick.style.boxShadow = "none";
+
+});
+burgerClick.addEventListener("mouseup", function() {
+    burgerClick.style.boxShadow = "0 1rem 2rem hsl(0, 0%, 32%)";
 });

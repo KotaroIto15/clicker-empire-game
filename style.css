@@ -163,6 +163,7 @@
 .img-wrap > img {
     height: 100%;
     width: 100%;
+    object-fit: contain;
 }
 
 .name-price {
@@ -270,6 +271,12 @@
     height: 100%;
 }
 
+.purchase-img-wrap > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 .enter-num {
     display: flex;
     flex-direction: column;
@@ -331,4 +338,10 @@
     color: #10462C;
     font-size: 2rem;
     box-shadow: 0 0.5rem 1rem hsl(0, 12%, 92%);
+}
+
+.back-purchase > button:hover {
+    background-color: #10462C;
+    color: white;
+    border-color: white;
 }

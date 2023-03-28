@@ -4,6 +4,7 @@ const config =
     login: document.getElementById("login-bg"),
     game: document.getElementById("game-bg"),
     itemList: document.getElementById("item-list"),
+    confirmation: document.getElementById("confirmation"),
 };
 
 let user;
@@ -17,7 +18,7 @@ function switchPage(hide, show) {
 }
 
 function displayItem(item) {
-    let newName = item.name.replace(" ", "-");
+    let newName = item.name.replaceAll(" ", "-");
     
     let container = document.createElement("div");
     container.id = newName;
@@ -41,7 +42,65 @@ function displayItem(item) {
         </div>
     `;
 
+    container.addEventListener("click", function() {
+        displayConfirmation(item);
+    });
+
     config.itemList.append(container);
+}
+
+function displayConfirmation(item) {
+
+    config.confirmation.innerHTML = "";
+
+    let container = document.createElement("div");
+    container.classList.add("h-100", "w-100");
+
+    container.innerHTML =
+    `
+        <div class = "description">
+            <div id = "basic-info">
+                <h1>${item.name}</h1>
+                <p>Max Purchase: ${item.max}</p>
+                <p>Price: $${item.price}</p>
+                <p>Get ${item.profit} extra yen per second</p>
+            </div>
+            <div class = "purchase-img-wrap">
+                <img src="${item.image}" alt="">
+            </div>
+        </div>
+
+        <div class = "enter-num">
+            <p class = "ask">How Many would you like to purchase?</p>
+            <input id = "num-purchase" type="text" placeholder="Please Enter Amount">
+            <p id = "total-fee" class = "total-purchase">Total: $0</p>
+        </div>
+
+        <div class = "back-purchase">
+            <button id = "go-back">Go Back</button>
+            <button id = "confirm">Purchase</button>
+        </div>
+    `;
+
+    config.confirmation.append(container);
+    addEventsOnConfirmation(item);
+    switchPage(config.itemList, config.confirmation);
+}
+
+function addEventsOnConfirmation(item) {
+    let input = config.confirmation.querySelector("#num-purchase");
+    input.addEventListener("change", function() {
+        let amount = parseInt(input.value);
+        let fee = document.getElementById("total-fee");
+        fee.innerHTML = "Total: $" + (amount * item.price);
+    });
+
+    let back = config.confirmation.querySelector("#go-back");
+    back.addEventListener("click", function() {
+        switchPage(config.confirmation, config.itemList);
+    });
+
+    // when purchase is pressed, update the current state of items.
 }
 
 function startGame() {
@@ -59,6 +118,7 @@ let start = document.getElementById("start-new");
 start.addEventListener("click", function() {
     config.itemList.innerHTML = "";
     items.forEach(displayItem);
+    console.log(config.game);
     startGame();
     switchPage(config.login, config.game);
 });

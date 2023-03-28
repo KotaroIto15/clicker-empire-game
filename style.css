@@ -226,3 +226,109 @@
 .button-container > i {
     color: #10462C;
 }
+
+.purchase {
+    height: 65%;
+    width: 85%;
+    background-color: #10462C;
+    box-shadow: 0 1rem 2rem hsl(0, 0%, 32%);
+}
+
+.description {
+    height: 50%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding-top: 2rem;
+}
+
+#basic-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#basic-info > h1 {
+    font-family: cursive;
+    color: white;
+    font-weight: bold;
+    font-size: 4rem;
+}
+
+#basic-info > p {
+    font-family: cursive;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.purchase-img-wrap {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    width: 35%;
+    height: 100%;
+}
+
+.enter-num {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    width: 100%;
+    height: 30%;
+}
+
+.enter-num > p {
+    font-family: cursive;
+    color: white;
+    font-size: 2rem;
+}
+
+.ask {
+    margin-left: 1rem;
+    text-align: left;
+}
+
+.total-purchase {
+    margin-right: 1rem;
+    text-align: right;
+}
+
+#num-purchase {
+    height: 25%;
+    border-radius: 5px;
+    font-style: italic;
+    font-size: xx-large;
+    font-family: cursive;
+    text-align: right;
+    color: #2BC17C;
+    padding-right: 1rem;
+}
+
+#num-purchase::placeholder {
+    font-family: cursive;
+    color: #2BC17C;
+}
+
+.back-purchase {
+    display: flex;
+    height: 20%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.back-purchase > button {
+    background-color: white;
+    border-color: #10462C;
+    border-width: 0.2rem;
+    border-radius: 8px;
+    height: 40%;
+    width: 15%;
+    margin: 1.5rem;
+    font-family: cursive;
+    color: #10462C;
+    font-size: 2rem;
+    box-shadow: 0 0.5rem 1rem hsl(0, 12%, 92%);
+}

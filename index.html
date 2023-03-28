@@ -14,7 +14,7 @@
 <body>
 
     <div class = "main-bg min-vh-100">
-        <div id = "login-bg" class = "d-flex min-vh-100 col-12 justify-content-center align-items-center">
+        <div id = "login-bg" class = "d-none d-flex min-vh-100 col-12 justify-content-center align-items-center">
             <div class = "login col-md-5 col-lg-4 pt-3 pb-4">
                 <h1 class = "title mb-3">Clicker Empire Game</h1>
                 <div class = "d-flex col-10 justify-content-center mb-3">
@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div id = "game-bg" class = "d-none d-flex col-12 min-vh-100">
+        <div id = "game-bg" class = "d-flex col-12 min-vh-100">
 
             <div id = "burger-bg" class = "col-4">
 
@@ -65,7 +65,7 @@
                     </div>
                 </div>
 
-                <div id = "item-list" class = "item-list mt-3">
+                <div id = "item-list" class = "d-none item-list mt-3">
                     <div id = "flip-machine" class="item">
                         <div class="item-info">
                             <div class="img-wrap">
@@ -83,6 +83,32 @@
                             <p class="fs-4">+$25 / sec</p>
                         </div>
                     </div>
+                </div>
+
+                <div class = "purchase mt-3">
+                    <div class = "description">
+                        <div id = "basic-info">
+                            <h1>House</h1>
+                            <p>Max Purchase: 100</p>
+                            <p>Price: $20,000,000</p>
+                            <p>Get 32,000 extra yen per second</p>
+                        </div>
+                        <div class = "purchase-img-wrap">
+                            <img src="images/burger-flipper.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <div class = "enter-num">
+                        <p class = "ask">How Many would you like to purchase?</p>
+                        <input id = "num-purchase" type="text" placeholder="Please Enter Amount">
+                        <p id = "total-fee" class = "total-purchase">Total: $100,000,000</p>
+                    </div>
+
+                    <div class = "back-purchase">
+                        <button id = "go-back">Go Back</button>
+                        <button id = "confirm">Purchase</button>
+                    </div>
+
                 </div>
 
                 <div class = "save-reset mt-3">

@@ -7,9 +7,52 @@ const config =
     confirmation: document.getElementById("confirmation"),
 };
 
-let user;
+let game;
 
 // CLASS DEFINITION //
+class Game {
+
+    /**
+     * 
+     * @param {String} name : name of the user
+     * @param {int} age : current age of the user, starting from 0,
+     * @param {int} days : current days passed in the game, starting from 0.
+     * @param {int} money : current balance of the player.
+     * @param {int} burgers : current # of burgers made.
+     * @param {Map<String, int>} itemStates : mapping the name of the item to the # of items purchased by the player.
+     */
+
+    constructor(name) {
+        this.name = name;
+        this.age = 0;
+        this.days = 0;
+        this.money = 0;
+        this.burgers = 0;
+        this.itemStates = this.initializeMap();
+    }
+
+    initializeMap() {
+        let map = new Map();
+        map.set("Burger Flipper", 1);
+
+        for (let i = 1; i < items.length; i++) {
+            let item = items[i];
+            map.set(item.name, 0);
+        }
+
+        console.log(map);
+
+        return map;
+    }
+
+    findItem(key) {
+        return this.itemStates.get(key);
+    }
+
+    purchaseItem(key, amount) {
+        this.itemStates.set(key, this.itemStates.get(key) + amount);
+    }
+}
 
 
 function switchPage(hide, show) {
@@ -37,7 +80,7 @@ function displayItem(item) {
         </div>
 
         <div class="item-current-state">
-            <h1 class="text-center" id = "item-number">2</h1>
+            <h1 class="text-center" id = "item-number">${game.findItem(item.name)}</h1>
             <p class="fs-4">+$${item.profit} / sec</p>
         </div>
     `;
@@ -47,6 +90,11 @@ function displayItem(item) {
     });
 
     config.itemList.append(container);
+}
+
+function updateItemList() {
+    config.itemList.innerHTML = "";
+    items.forEach(displayItem);
 }
 
 function displayConfirmation(item) {
@@ -101,25 +149,33 @@ function addEventsOnConfirmation(item) {
     });
 
     // when purchase is pressed, update the current state of items.
+    let purchase = config.confirmation.querySelector("#confirm");
+    purchase.addEventListener("click", function() {
+        if (input.value == null) return;
+
+        let amount = parseInt(input.value);
+        game.purchaseItem(item.name, amount);
+        updateItemList();
+        switchPage(config.confirmation, config.itemList);
+    });
 }
 
 function startGame() {
     let userName = document.getElementById("user-name");
-    user = new User(userName.value);
+    game = new Game(userName);
     
     let profile = document.getElementById("right-div");
-    profile.querySelector("#name").innerHTML = user.name;
-    profile.querySelector("#age").innerHTML = user.age;
-    profile.querySelector("#days").innerHTML = user.days;
-    profile.querySelector("#money").innerHTML = user.balance;
+    profile.querySelector("#name").innerHTML = game.name;
+    profile.querySelector("#age").innerHTML = game.age;
+    profile.querySelector("#days").innerHTML = game.days;
+    profile.querySelector("#money").innerHTML = game.money;
 }
 
 let start = document.getElementById("start-new");
 start.addEventListener("click", function() {
     config.itemList.innerHTML = "";
-    items.forEach(displayItem);
-    console.log(config.game);
     startGame();
+    updateItemList();
     switchPage(config.login, config.game);
 });
 

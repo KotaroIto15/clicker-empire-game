@@ -306,7 +306,7 @@
     height: 25%;
     border-radius: 5px;
     font-style: italic;
-    font-size: xx-large;
+    font-size: 1rem;
     font-family: cursive;
     text-align: right;
     color: #2BC17C;
@@ -336,7 +336,7 @@
     margin: 1.5rem;
     font-family: cursive;
     color: #10462C;
-    font-size: 2rem;
+    font-size: 1rem;
     box-shadow: 0 0.5rem 1rem hsl(0, 12%, 92%);
 }
 

@@ -5,6 +5,9 @@ const config =
     game: document.getElementById("game-bg"),
     itemList: document.getElementById("item-list"),
     confirmation: document.getElementById("confirmation"),
+
+    burger: document.getElementById("burger-info"),
+    profile: document.getElementById("profile"),
 };
 
 let game;
@@ -49,8 +52,14 @@ class Game {
         return this.itemStates.get(key);
     }
 
-    purchaseItem(key, amount) {
-        this.itemStates.set(key, this.itemStates.get(key) + amount);
+    purchaseItem(item, amount) {
+        if (this.money < item.price * amount) {
+            alert("Insufficient Balance. Please try different amount.");
+            return;
+        }
+
+        this.itemStates.set(item.name, this.itemStates.get(item.name) + amount);
+        this.money -= item.price * amount;
     }
 }
 
@@ -95,6 +104,7 @@ function displayItem(item) {
 function updateItemList() {
     config.itemList.innerHTML = "";
     items.forEach(displayItem);
+    config.burger.querySelector("#burger-per-sec").innerHTML = "$" + (25 * game.findItem("Burger Flipper") + " per second");
 }
 
 function displayConfirmation(item) {
@@ -154,21 +164,30 @@ function addEventsOnConfirmation(item) {
         if (input.value == null) return;
 
         let amount = parseInt(input.value);
-        game.purchaseItem(item.name, amount);
+        game.purchaseItem(item, amount);
         updateItemList();
+        config.profile.querySelector("#money").innerHTML = "$" + game.money;
         switchPage(config.confirmation, config.itemList);
     });
 }
 
 function startGame() {
-    let userName = document.getElementById("user-name");
+    let userName = document.getElementById("user-name").value;
     game = new Game(userName);
     
     let profile = document.getElementById("right-div");
     profile.querySelector("#name").innerHTML = game.name;
     profile.querySelector("#age").innerHTML = game.age;
     profile.querySelector("#days").innerHTML = game.days;
-    profile.querySelector("#money").innerHTML = game.money;
+    profile.querySelector("#money").innerHTML = "$" + game.money;
+
+    setInterval(function() {
+        game.days++;
+        if (game.days % 365 == 0) game.age++;
+    
+        config.profile.querySelector("#days").innerHTML = game.days + " days";
+        config.profile.querySelector("#age").innerHTML = game.age;
+    }, 1000);
 }
 
 let start = document.getElementById("start-new");
@@ -182,8 +201,14 @@ start.addEventListener("click", function() {
 let burgerClick = document.getElementById("burger-click");
 burgerClick.addEventListener("mousedown", function() {
     burgerClick.style.boxShadow = "none";
+    game.burgers++;
+    game.money += (25 * game.findItem("Burger Flipper"));
 
+    config.profile.querySelector("#money").innerHTML = "$" + game.money;
+    config.burger.querySelector("#burger-num").innerHTML = game.burgers + " burgers";
+    config.burger.querySelector("#burger-per-sec").innerHTML = "$" + (25 * game.findItem("Burger Flipper") + " per second");
 });
+
 burgerClick.addEventListener("mouseup", function() {
     burgerClick.style.boxShadow = "0 1rem 2rem hsl(0, 0%, 32%)";
 });

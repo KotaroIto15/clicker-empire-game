@@ -19,7 +19,7 @@ class Item {
 }
 
 const items = [
-    new Item("Burger Flipper", 20000, 25, 500, "images/burger-flipper.jpg"),
+    new Item("Burger Flipper", 15000, 25, 500, "images/burger-flipper.jpg"),
     new Item("ETF Stock", 300000, 300, -1, "images/etf-stock.jpg"),
     new Item("ETF Bonds", 300000, 210, -1, "images/etf-bonds.jpg"),
     new Item("Lemonade Stand", 30000, 30, 1000, "images/lemonade.jpg"),

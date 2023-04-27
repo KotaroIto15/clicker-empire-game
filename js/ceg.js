@@ -11,6 +11,7 @@ const config =
 };
 
 let game;
+let interval;
 
 // CLASS DEFINITION //
 class Game {
@@ -29,7 +30,7 @@ class Game {
         this.name = name;
         this.age = 0;
         this.days = 0;
-        this.money = 0;
+        this.money = 1000000000;
         this.burgers = 0;
         this.itemStates = this.initializeMap();
     }
@@ -42,8 +43,6 @@ class Game {
             let item = items[i];
             map.set(item.name, 0);
         }
-
-        console.log(map);
 
         return map;
     }
@@ -180,22 +179,128 @@ function startGame() {
     profile.querySelector("#age").innerHTML = game.age;
     profile.querySelector("#days").innerHTML = game.days;
     profile.querySelector("#money").innerHTML = "$" + game.money;
+    
+    update();
+}
 
-    setInterval(function() {
+function resumeGame(data) {
+    game = new Game(data.name);
+
+    game.age = parseInt(data.age);
+    game.days = parseInt(data.days);
+    game.money = parseInt(data.money);
+    game.burgers = parseInt(data.burgers);
+    game.itemStates = new Map(Object.entries(data.itemStates));
+    items.forEach((item)=>{
+        let val = game.findItem(item.name);
+        game.itemStates.set(item.name, parseInt(val));
+    });
+
+    let profile = document.getElementById("right-div");
+    profile.querySelector("#name").innerHTML = game.name;
+    profile.querySelector("#age").innerHTML = game.age;
+    profile.querySelector("#days").innerHTML = game.days;
+    profile.querySelector("#money").innerHTML = "$" + game.money;
+
+    update();
+}
+
+function update() {
+    interval = setInterval(function() {
         game.days++;
         if (game.days % 365 == 0) game.age++;
     
         config.profile.querySelector("#days").innerHTML = game.days + " days";
         config.profile.querySelector("#age").innerHTML = game.age;
+
+        updateMoney();
     }, 1000);
+}
+
+function updateMoney() {
+    let profit = 0;
+    if (game.findItem("ETF Stock") > 0) ; // operation on ETF Stock
+    if (game.findItem("ETF Bonds") > 0) profit += 300000 * game.findItem("ETF Bonds") * 0.0007;
+    if (game.findItem("Lemonade Stand") > 0) profit += 30 * game.findItem("Lemonade Stand");
+    if (game.findItem("Ice Cream Truck") > 0) profit += 120 * game.findItem("Ice Cream Truck");
+    if (game.findItem("House") > 0) profit += 32000 * game.findItem("House");
+    if (game.findItem("TownHouse") > 0) profit += 64000 * game.findItem("TownHouse");
+    if (game.findItem("Mansion") > 0) profit += 500000 * game.findItem("Mansion");
+    if (game.findItem("Industrial Space") > 0) profit += 2200000 * game.findItem("Industrial Space");
+    if (game.findItem("Hotel Skyscraper") > 0) profit += 2500000 * game.findItem("Hotel Skyscraper");
+    if (game.findItem("Bullet Train") > 0) profit += 30000000000 * game.findItem("Bullet Train");
+    
+    game.money += parseInt(profit);
+    config.profile.querySelector("#money").innerHTML = "$" + game.money;
+}
+
+function writeToJSON() {
+    let text = 
+    `
+    {
+        "name" : "${game.name}",
+        "age" : "${game.age}",
+        "days" : "${game.days}",
+        "money" : "${game.money}",
+        "burgers" : "${game.burgers}",
+        "itemStates":
+        {
+            "Burger Flipper" : "${game.findItem("Burger Flipper")}",
+            "ETF Stock" : "${game.findItem("ETF Stock")}",
+            "ETF Bonds" : "${game.findItem("ETF Bonds")}",
+            "Lemonade Stand" : "${game.findItem("Lemonade Stand")}",
+            "Ice Cream Truck" : "${game.findItem("Ice Cream Truck")}",
+            "House" : "${game.findItem("House")}",
+            "TownHouse" : "${game.findItem("TownHouse")}",
+            "Mansion" : "${game.findItem("Mansion")}",
+            "Industrial Space" : "${game.findItem("Industrial Space")}",
+            "Hotel Skyscraper" : "${game.findItem("Hotel Skyscraper")}",
+            "Bullet Train" : "${game.findItem("Bullet Train")}"
+        }
+    }
+    `;
+
+    localStorage.setItem(game.name, text);
 }
 
 let start = document.getElementById("start-new");
 start.addEventListener("click", function() {
-    config.itemList.innerHTML = "";
-    startGame();
+    localStorage.clear();
+    let userName = document.getElementById("user-name").value;
+    if (localStorage.getItem(userName) != null) alert("You cannot use this user name. Try typing another name.");
+
+    else {
+        config.itemList.innerHTML = "";
+        startGame();
+        updateItemList();
+        switchPage(config.login, config.game);
+    }
+});
+
+let resume = document.getElementById("resume");
+resume.addEventListener("click", function() {
+    let text = localStorage.getItem(document.getElementById("user-name").value);
+    if (text == null) {
+        alert("Entered username does not have a saved game state. Please start a new game or try typing another name.");
+        return;
+    }
+    let data = JSON.parse(text);
+    resumeGame(data);
     updateItemList();
     switchPage(config.login, config.game);
+});
+
+let save = document.getElementById("save");
+save.addEventListener("click", function() {
+    writeToJSON();
+});
+
+let reset = document.getElementById("reset");
+reset.addEventListener("click", function() {
+    if (confirm("Do you want to save the current game state?")) writeToJSON();
+
+    clearInterval(interval);
+    switchPage(config.game, config.login);
 });
 
 let burgerClick = document.getElementById("burger-click");

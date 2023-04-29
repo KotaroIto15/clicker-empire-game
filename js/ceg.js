@@ -30,7 +30,7 @@ class Game {
         this.name = name;
         this.age = 0;
         this.days = 0;
-        this.money = 1000000000;
+        this.money = 10000000000000;
         this.burgers = 0;
         this.itemStates = this.initializeMap();
     }
@@ -51,14 +51,29 @@ class Game {
         return this.itemStates.get(key);
     }
 
-    purchaseItem(item, amount) {
-        if (this.money < item.price * amount) {
+    purchaseItem(item, amount, finalPrice) {
+
+
+        if (this.money < finalPrice) {
             alert("Insufficient Balance. Please try different amount.");
             return;
         }
 
-        this.itemStates.set(item.name, this.itemStates.get(item.name) + amount);
-        this.money -= item.price * amount;
+        this.itemStates.set(item.name, this.findItem(item.name) + amount);
+        this.money -= finalPrice;
+        if (item.name == "ETF Stock") item.price = Math.round(item.price * Math.pow(1.1, amount));
+
+        this.updateProfit(item);
+    }
+
+    calculateTotalPrice(item, amount) {
+        if (item.name == "ETF Stock") return Math.round(item.price * 10 * (Math.pow(1.1, amount) - 1));
+        else return item.price * amount;
+    }
+
+    updateProfit(item) {
+        if (item.name == "ETF Stock") item.profit = Math.round(300000 * Math.pow(1.1, game.findItem(item.name)) * 0.001);
+        else if (item.name == "ETF Bonds") item.profit += 300000 * 0.0007;
     }
 }
 
@@ -149,7 +164,8 @@ function addEventsOnConfirmation(item) {
     input.addEventListener("change", function() {
         let amount = parseInt(input.value);
         let fee = document.getElementById("total-fee");
-        fee.innerHTML = "Total: $" + (amount * item.price);
+        let totalPrice = game.calculateTotalPrice(item, amount);
+        fee.innerHTML = "Total: $" + totalPrice;
     });
 
     let back = config.confirmation.querySelector("#go-back");
@@ -163,7 +179,7 @@ function addEventsOnConfirmation(item) {
         if (input.value == null) return;
 
         let amount = parseInt(input.value);
-        game.purchaseItem(item, amount);
+        game.purchaseItem(item, amount, game.calculateTotalPrice(item, amount));
         updateItemList();
         config.profile.querySelector("#money").innerHTML = "$" + game.money;
         switchPage(config.confirmation, config.itemList);
@@ -174,12 +190,7 @@ function startGame() {
     let userName = document.getElementById("user-name").value;
     game = new Game(userName);
     
-    let profile = document.getElementById("right-div");
-    profile.querySelector("#name").innerHTML = game.name;
-    profile.querySelector("#age").innerHTML = game.age;
-    profile.querySelector("#days").innerHTML = game.days;
-    profile.querySelector("#money").innerHTML = "$" + game.money;
-    
+    setProfile();
     update();
 }
 
@@ -196,13 +207,17 @@ function resumeGame(data) {
         game.itemStates.set(item.name, parseInt(val));
     });
 
+    setProfile();
+
+    update();
+}
+
+function setProfile() {
     let profile = document.getElementById("right-div");
     profile.querySelector("#name").innerHTML = game.name;
     profile.querySelector("#age").innerHTML = game.age;
     profile.querySelector("#days").innerHTML = game.days;
     profile.querySelector("#money").innerHTML = "$" + game.money;
-
-    update();
 }
 
 function update() {
@@ -219,16 +234,16 @@ function update() {
 
 function updateMoney() {
     let profit = 0;
-    if (game.findItem("ETF Stock") > 0) ; // operation on ETF Stock
-    if (game.findItem("ETF Bonds") > 0) profit += 300000 * game.findItem("ETF Bonds") * 0.0007;
-    if (game.findItem("Lemonade Stand") > 0) profit += 30 * game.findItem("Lemonade Stand");
-    if (game.findItem("Ice Cream Truck") > 0) profit += 120 * game.findItem("Ice Cream Truck");
-    if (game.findItem("House") > 0) profit += 32000 * game.findItem("House");
-    if (game.findItem("TownHouse") > 0) profit += 64000 * game.findItem("TownHouse");
-    if (game.findItem("Mansion") > 0) profit += 500000 * game.findItem("Mansion");
-    if (game.findItem("Industrial Space") > 0) profit += 2200000 * game.findItem("Industrial Space");
-    if (game.findItem("Hotel Skyscraper") > 0) profit += 2500000 * game.findItem("Hotel Skyscraper");
-    if (game.findItem("Bullet Train") > 0) profit += 30000000000 * game.findItem("Bullet Train");
+
+    items.forEach((item) => {
+        if (item.name == "Burger Flipper") return;
+        let numItem = game.findItem(item.name);
+        if (numItem <= 0) return;
+
+        if (item.name == "ETF Stock") profit += 300000 * 10 * (Math.pow(1.1, game.findItem("ETF Stock")) - 1) * 0.001;
+        else if (item.name == "ETF Bonds") profit += 300000 * game.findItem("ETF Bonds") * 0.0007;
+        else profit += item.profit * game.findItem(item.name);
+    });
     
     game.money += parseInt(profit);
     config.profile.querySelector("#money").innerHTML = "$" + game.money;

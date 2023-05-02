@@ -1,4 +1,5 @@
 // CONSTANTS //
+
 const config = 
 {
     login: document.getElementById("login-bg"),
@@ -280,7 +281,6 @@ function writeToJSON() {
 
 let start = document.getElementById("start-new");
 start.addEventListener("click", function() {
-    localStorage.clear();
     let userName = document.getElementById("user-name").value;
     if (localStorage.getItem(userName) != null) alert("You cannot use this user name. Try typing another name.");
 
@@ -308,6 +308,7 @@ resume.addEventListener("click", function() {
 let save = document.getElementById("save");
 save.addEventListener("click", function() {
     writeToJSON();
+    alert("saved!!");
 });
 
 let reset = document.getElementById("reset");

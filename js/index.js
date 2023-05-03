@@ -2,6 +2,19 @@ const http = require("http");
 const fs = require("fs");
 const url = require("url");
 const { isObject } = require("util");
+const dotenv = require("dotenv").config();
+
+const mysql = require("mysql");
+const con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    socketPath: "/tmp/mysql.sock",
+    database: "clicker_empire_game",
+    password: process.env.SQL_PASS
+});
+con.connect(function(err){
+    if (err) throw err;
+});
 
 const server = http.createServer(routeSetting);
 const io = require('socket.io')(server);
@@ -129,17 +142,80 @@ function routeSetting(req, res) {
     }
 }
 
+function searchDataByName(id, name) {
+    let userName = JSON.stringify(name);
+
+    con.query(
+        `
+            SELECT * FROM  save_data WHERE name = ${userName};
+        `,
+        function(err, result) {
+            if (err) {
+                console.log(err);
+                io.emit(id, "A serious error occured. Please try again.");
+            } else io.emit(id, result);
+        }
+    );
+}
+
 io.on('connection', function(socket){
 
-    socket.on("store", function(msg){
-        console.log(msg[0]);
+    socket.on("start", function(name){
+        searchDataByName("start", name);
     });
 
-    socket.on("load", function(msg){
-        console.log(msg);
-        io.emit("load", "received");
+    socket.on("check", function(name){
+        searchDataByName("check", name);
+    })
+
+    socket.on("store", function(name, age, days, money, burgers, states){  
+
+        let states_json = JSON.parse(JSON.stringify(states));
+
+        con.query(
+            `
+                INSERT INTO save_data (name, age, days, money, burgers, item_states) 
+                VALUES(${JSON.stringify(name)}, ${age}, ${days}, ${money}, ${burgers}, JSON_ARRAY(${states_json}));
+            `, 
+            function(err, result){
+                if (err) {                        
+                    console.log(err);
+                    io.emit("store", "A serious error occurred. Please try again.");   
+                }
+                else io.emit("store", "Saved!!");
+            }
+        );
+    });
+
+    socket.on("update", function(name, age, days, money, burgers, states){
+        let states_json = JSON.parse(JSON.stringify(states));
+
+        con.query(
+            `
+                UPDATE save_data
+                SET age = ${age}, days = ${days}, money = ${money}, burgers = ${burgers}, item_states = JSON_ARRAY(${states_json})
+                WHERE name = ${JSON.stringify(name)};
+            `,
+            function (err, result){
+                if (err) {
+                    console.log(err);
+                    io.emit("update", "A seroius error occurred. Please try again.");
+                }
+                else io.emit("update", "Saved!!");
+            }
+        );
+    });
+
+    socket.on("load", function(name){
+        searchDataByName("load", name);
     });
 });
 
 server.listen(3000);
 console.log("Server start!");
+
+process.on("SIGINT", function() {
+    console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
+    con.end();
+    process.exit();
+});

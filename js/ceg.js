@@ -52,6 +52,17 @@ class Game {
         return map;
     }
 
+    restoreMap(arr) {
+        let map = new Map();
+        
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            map.set(item.name, arr[i]);
+        }
+
+        return map;
+    }
+
     findItem(key) {
         return this.itemStates.get(key);
     }
@@ -201,16 +212,11 @@ function startGame() {
 
 function resumeGame(data) {
     game = new Game(data.name);
-
-    game.age = parseInt(data.age);
-    game.days = parseInt(data.days);
-    game.money = parseInt(data.money);
-    game.burgers = parseInt(data.burgers);
-    game.itemStates = new Map(Object.entries(data.itemStates));
-    items.forEach((item)=>{
-        let val = game.findItem(item.name);
-        game.itemStates.set(item.name, parseInt(val));
-    });
+    game.age = data.age;
+    game.days = data.days;
+    game.money = data.money;
+    game.burgers = data.burgers;
+    game.itemStates = game.restoreMap(JSON.parse(data.item_states));
 
     setProfile();
 
@@ -254,93 +260,79 @@ function updateMoney() {
     config.profile.querySelector("#money").innerHTML = "$" + game.money;
 }
 
-function writeToJSON() {
-    // let text = 
-    // `
-    // {
-    //     "name" : "${game.name}",
-    //     "age" : "${game.age}",
-    //     "days" : "${game.days}",
-    //     "money" : "${game.money}",
-    //     "burgers" : "${game.burgers}",
-    //     "itemStates":
-    //     {
-    //         "Burger Flipper" : "${game.findItem("Burger Flipper")}",
-    //         "ETF Stock" : "${game.findItem("ETF Stock")}",
-    //         "ETF Bonds" : "${game.findItem("ETF Bonds")}",
-    //         "Lemonade Stand" : "${game.findItem("Lemonade Stand")}",
-    //         "Ice Cream Truck" : "${game.findItem("Ice Cream Truck")}",
-    //         "House" : "${game.findItem("House")}",
-    //         "TownHouse" : "${game.findItem("TownHouse")}",
-    //         "Mansion" : "${game.findItem("Mansion")}",
-    //         "Industrial Space" : "${game.findItem("Industrial Space")}",
-    //         "Hotel Skyscraper" : "${game.findItem("Hotel Skyscraper")}",
-    //         "Bullet Train" : "${game.findItem("Bullet Train")}"
-    //     }
-    // }
-    // `;
+function tryStoring() {
+    
+    socket.emit("check", game.name);
+    socket.on("check", function(data){
+
+        if (data.length > 0) {
+            if (confirm("You already have a save data. Do you want to overwrite it?") == false) return;
+            else prepareDataToStore("update");
+        } else {
+            prepareDataToStore("store");
+        }
+    });
+}
+
+function prepareDataToStore(id) {
 
     let states = [];
     items.forEach((item) => {
         states.push(game.findItem(item.name));
     });
 
-    socket.emit("store", states);
-
-
-    // var con = mysql.createConnection({
-    //     host: "localhost",
-    //     user: "root",
-    //     password: process.env.SQL_PASS
-    // });
-
-    // con.connect(function(err){
-    //     if (err) throw err;
-    //     else console.log("Connected!")
-    // });
-
-    // localStorage.setItem(game.name, text);
+    socket.emit(id, game.name, game.age, game.days, game.money, game.burgers, states);
+    socket.on(id, function(msg){
+        alert(msg);
+    });
 }
 
 let start = document.getElementById("start-new");
 start.addEventListener("click", function() {
     let userName = document.getElementById("user-name").value;
-    if (localStorage.getItem(userName) != null) alert("You cannot use this user name. Try typing another name.");
 
-    else {
+    socket.emit("start", userName);
+    socket.on("start", function(data){
+        if (typeof data == "String") alert(data);
+
+        if (data.length > 0) {
+            alert("You cannot use this user name. Try typing another name.");
+            return;
+        }
+
         config.itemList.innerHTML = "";
         startGame();
         updateItemList();
         switchPage(config.login, config.game);
-    }
+    });
 });
 
 let resume = document.getElementById("resume");
 resume.addEventListener("click", function() {
+
     socket.emit('load', document.getElementById("user-name").value);
-    socket.on("load", function(msg){
-        console.log(msg);
+    socket.on("load", function(data){
+        if (typeof data == "String") alert(data);
+
+        if (data.length == 0) {
+            alert("Entered username does not have a saved game state. Please start a new game or try typing another name.");
+            return;
+        }
+        resumeGame(data[0]);
+        updateItemList();
+        switchPage(config.login, config.game);
     });
-    // let text = localStorage.getItem(document.getElementById("user-name").value);
-    // if (text == null) {
-    //     alert("Entered username does not have a saved game state. Please start a new game or try typing another name.");
-    //     return;
-    // }
-    // let data = JSON.parse(text);
-    // resumeGame(data);
-    // updateItemList();
-    // switchPage(config.login, config.game);
+
 });
 
 let save = document.getElementById("save");
 save.addEventListener("click", function() {
-    writeToJSON();
-    alert("saved!!");
+    tryStoring();
 });
 
 let reset = document.getElementById("reset");
 reset.addEventListener("click", function() {
-    if (confirm("Do you want to save the current game state?")) writeToJSON();
+    if (confirm("Do you want to save the current game state?")) tryStoring();
 
     clearInterval(interval);
     switchPage(config.game, config.login);

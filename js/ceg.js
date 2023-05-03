@@ -318,6 +318,9 @@ start.addEventListener("click", function() {
 let resume = document.getElementById("resume");
 resume.addEventListener("click", function() {
     socket.emit('load', document.getElementById("user-name").value);
+    socket.on("load", function(msg){
+        console.log(msg);
+    });
     // let text = localStorage.getItem(document.getElementById("user-name").value);
     // if (text == null) {
     //     alert("Entered username does not have a saved game state. Please start a new game or try typing another name.");

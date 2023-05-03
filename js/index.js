@@ -129,10 +129,6 @@ function routeSetting(req, res) {
     }
 }
 
-function store_data(data) {
-    console.log("Function properly called!!");
-}
-
 io.on('connection', function(socket){
 
     socket.on("store", function(msg){
@@ -141,6 +137,7 @@ io.on('connection', function(socket){
 
     socket.on("load", function(msg){
         console.log(msg);
+        io.emit("load", "received");
     });
 });
 

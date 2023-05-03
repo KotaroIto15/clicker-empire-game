@@ -1,8 +1,10 @@
 const http = require("http");
 const fs = require("fs");
 const url = require("url");
+const { isObject } = require("util");
 
 const server = http.createServer(routeSetting);
+const io = require('socket.io')(server);
 
 function routeSetting(req, res) {
     let url_parts = url.parse(req.url);
@@ -25,14 +27,14 @@ function routeSetting(req, res) {
         case '/js/ceg.js':
             const ceg = fs.readFileSync("./js/ceg.js");
             console.log("ceg.js is read");
-            res.writeHead(200, {"Content-Type" : "text/plain"});
+            res.writeHead(200, {"Content-Type" : "application/javascript"});
             res.write(ceg);
             res.end();
             break;
         case '/js/Item.js':
             const item = fs.readFileSync("./js/Item.js");
             console.log("Item.js is read");
-            res.writeHead(200, {"Content-Type" : "text/plain"});
+            res.writeHead(200, {"Content-Type" : "application/javascript"});
             res.write(item);
             res.end();
             break;
@@ -126,6 +128,21 @@ function routeSetting(req, res) {
             break;
     }
 }
+
+function store_data(data) {
+    console.log("Function properly called!!");
+}
+
+io.on('connection', function(socket){
+
+    socket.on("store", function(msg){
+        console.log(msg[0]);
+    });
+
+    socket.on("load", function(msg){
+        console.log(msg);
+    });
+});
 
 server.listen(3000);
 console.log("Server start!");

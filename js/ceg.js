@@ -11,8 +11,12 @@ const config =
     profile: document.getElementById("profile"),
 };
 
+// const mysql = require("mysql");
+// const dotenv = require("dotenv").config();
+
 let game;
 let interval;
+var socket = io();
 
 // CLASS DEFINITION //
 class Game {
@@ -251,32 +255,51 @@ function updateMoney() {
 }
 
 function writeToJSON() {
-    let text = 
-    `
-    {
-        "name" : "${game.name}",
-        "age" : "${game.age}",
-        "days" : "${game.days}",
-        "money" : "${game.money}",
-        "burgers" : "${game.burgers}",
-        "itemStates":
-        {
-            "Burger Flipper" : "${game.findItem("Burger Flipper")}",
-            "ETF Stock" : "${game.findItem("ETF Stock")}",
-            "ETF Bonds" : "${game.findItem("ETF Bonds")}",
-            "Lemonade Stand" : "${game.findItem("Lemonade Stand")}",
-            "Ice Cream Truck" : "${game.findItem("Ice Cream Truck")}",
-            "House" : "${game.findItem("House")}",
-            "TownHouse" : "${game.findItem("TownHouse")}",
-            "Mansion" : "${game.findItem("Mansion")}",
-            "Industrial Space" : "${game.findItem("Industrial Space")}",
-            "Hotel Skyscraper" : "${game.findItem("Hotel Skyscraper")}",
-            "Bullet Train" : "${game.findItem("Bullet Train")}"
-        }
-    }
-    `;
+    // let text = 
+    // `
+    // {
+    //     "name" : "${game.name}",
+    //     "age" : "${game.age}",
+    //     "days" : "${game.days}",
+    //     "money" : "${game.money}",
+    //     "burgers" : "${game.burgers}",
+    //     "itemStates":
+    //     {
+    //         "Burger Flipper" : "${game.findItem("Burger Flipper")}",
+    //         "ETF Stock" : "${game.findItem("ETF Stock")}",
+    //         "ETF Bonds" : "${game.findItem("ETF Bonds")}",
+    //         "Lemonade Stand" : "${game.findItem("Lemonade Stand")}",
+    //         "Ice Cream Truck" : "${game.findItem("Ice Cream Truck")}",
+    //         "House" : "${game.findItem("House")}",
+    //         "TownHouse" : "${game.findItem("TownHouse")}",
+    //         "Mansion" : "${game.findItem("Mansion")}",
+    //         "Industrial Space" : "${game.findItem("Industrial Space")}",
+    //         "Hotel Skyscraper" : "${game.findItem("Hotel Skyscraper")}",
+    //         "Bullet Train" : "${game.findItem("Bullet Train")}"
+    //     }
+    // }
+    // `;
 
-    localStorage.setItem(game.name, text);
+    let states = [];
+    items.forEach((item) => {
+        states.push(game.findItem(item.name));
+    });
+
+    socket.emit("store", states);
+
+
+    // var con = mysql.createConnection({
+    //     host: "localhost",
+    //     user: "root",
+    //     password: process.env.SQL_PASS
+    // });
+
+    // con.connect(function(err){
+    //     if (err) throw err;
+    //     else console.log("Connected!")
+    // });
+
+    // localStorage.setItem(game.name, text);
 }
 
 let start = document.getElementById("start-new");
@@ -294,15 +317,16 @@ start.addEventListener("click", function() {
 
 let resume = document.getElementById("resume");
 resume.addEventListener("click", function() {
-    let text = localStorage.getItem(document.getElementById("user-name").value);
-    if (text == null) {
-        alert("Entered username does not have a saved game state. Please start a new game or try typing another name.");
-        return;
-    }
-    let data = JSON.parse(text);
-    resumeGame(data);
-    updateItemList();
-    switchPage(config.login, config.game);
+    socket.emit('load', document.getElementById("user-name").value);
+    // let text = localStorage.getItem(document.getElementById("user-name").value);
+    // if (text == null) {
+    //     alert("Entered username does not have a saved game state. Please start a new game or try typing another name.");
+    //     return;
+    // }
+    // let data = JSON.parse(text);
+    // resumeGame(data);
+    // updateItemList();
+    // switchPage(config.login, config.game);
 });
 
 let save = document.getElementById("save");
